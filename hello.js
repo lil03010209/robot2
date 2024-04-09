@@ -1,5 +1,10 @@
 const puppeteer = require('puppeteer');
 const XLSX = require('xlsx');
+// 在 hello.js 文件的顶部添加
+const { dialog } = require('electron');
+
+
+
 
 function wait(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -47,7 +52,7 @@ async function fetchRiskAssessmentForPhoneNumber(page, phoneNumber) {
 
 
 
-async function run(phoneNumber, password) {
+async function run(phoneNumber, password, excelFilePath) {
 
 
 
@@ -176,7 +181,7 @@ async function run(phoneNumber, password) {
     });
 
     // 读取Excel文件
-    const workbook = XLSX.readFile('./number.xlsx');
+    const workbook = XLSX.readFile(excelFilePath);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
     // 确保列名被正确解析
@@ -196,8 +201,20 @@ async function run(phoneNumber, password) {
         console.log(`电话号码 ${i}: ${phoneNumber} 的风险评估     :`, riskAssessment);
     }
 
+    // 弹出一个另存为的窗口，让用户选择保存文件的位置
+    const savePath = dialog.showSaveDialogSync({
+        title: '保存文件',
+        defaultPath: 'output.xlsx',
+        filters: [{ name: 'Excel 文件', extensions: ['xlsx'] }]
+    });
+
+    // 如果用户选择了保存位置，则将文件写入到选择的位置
+    if (savePath) {
+        XLSX.writeFile(workbook, savePath);
+    }
+
     // 循环结束后关闭浏览器实例
     await browser.close();
 }
 
-module.exports = { run };
+module.exports = { run  };

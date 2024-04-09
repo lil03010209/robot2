@@ -1,33 +1,31 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const hello = require('./hello.js'); // 引入 hello.js
+const hello = require('./hello.js');
+const { dialog } = require('electron');
+
 function createWindow() {
     let win = new BrowserWindow({
         width: 800,
         height: 600,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: false, // 注意安全风险
-            enableRemoteModule: true // 如果需要使用 remote 模块
+            contextIsolation: false,
         }
     });
-
     win.loadFile('index.html');
 }
 
 app.whenReady().then(createWindow);
 
-ipcMain.on('login', async (event, arg) => {
+ipcMain.on('login-and-import-excel', async (event, arg) => {
     try {
-        const result = await hello.run(arg.phoneNumber, arg.password); // 使用 arg 中的电话号码和密码调用 run 函数
-        event.reply('login-result', result); // 发送执行结果回渲染进程
+        const result = await hello.run(arg.phoneNumber, arg.password, arg.filePath);
+        event.reply('login-result', result);
     } catch (error) {
         console.error('Error executing run function:', error);
-        event.reply('login-error', error.message); // 发送错误信息回渲染进程
+        event.reply('login-error', error.message);
     }
 });
 
 app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
+    app.quit();
 });
