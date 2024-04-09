@@ -40,7 +40,7 @@ async function fetchRiskAssessmentForPhoneNumber(page, phoneNumber) {
     const riskAssessment = await page.evaluate(() => {
         const noDataElement = document.querySelector('.ivu-table-tip');
         if (noDataElement && (noDataElement.offsetParent !== null || getComputedStyle(noDataElement).display !== 'none') && noDataElement.textContent.includes('暂无数据')) {
-            return '暂无数据';
+            return '暂无数据哦';
         }
 
         const riskElement = document.querySelector('div.risk-type span');
