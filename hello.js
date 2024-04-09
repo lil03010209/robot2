@@ -193,7 +193,7 @@ async function run(phoneNumber, password) {
         workbook.Sheets[sheetName] = newWorksheet;
         XLSX.writeFile(workbook, './number.xlsx'); // 每次获取结果后都重新写入文件
 
-        console.log(`电话号码 ${i}: ${phoneNumber} 的风险评估：`, riskAssessment);
+        console.log(`电话号码 ${i}: ${phoneNumber} 的风险评估 ：`, riskAssessment);
     }
 
     // 循环结束后关闭浏览器实例
