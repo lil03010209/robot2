@@ -1,9 +1,28 @@
-const puppeteer = require('puppeteer');
+// 使用 puppeteer-core 而不是 puppeteer
+const puppeteer = require('puppeteer-core');
 const XLSX = require('xlsx');
 // 在 hello.js 文件的顶部添加
 const { dialog } = require('electron');
 
 
+
+// 获取 Chrome 路径的函数
+async function getChromePath(userProvidedPath) {
+    if (userProvidedPath !== '') {
+        // 如果用户提供了路径，则直接使用用户提供的路径
+        return userProvidedPath;
+    } else if (process.platform === 'win32') {
+        // 在 Windows 下，使用默认安装路径
+        return 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
+    } else if (process.platform === 'darwin') {
+        // 在 macOS 下，使用默认路径
+        return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
+    } else {
+        // 其他平台暂不支持
+        console.error('不支持的操作系统:', process.platform);
+        return '';
+    }
+}
 
 
 function wait(ms) {
@@ -51,26 +70,28 @@ async function fetchRiskAssessmentForPhoneNumber(page, phoneNumber) {
 }
 
 
+async function run(phoneNumber, password, excelFilePath, chromePath, updateProgressCallback) {
 
-async function run(phoneNumber, password, excelFilePath, updateProgressCallback) {
-
-
+    const chromeExecutablePath = await getChromePath(chromePath);
 
     const browser = await puppeteer.launch({
         headless: false, // 以非无头模式运行
         args: ['--window-size=2560,1440'], // 设置浏览器窗口大小为2K分辨率
         defaultViewport: null, // 使用args中指定的窗口大小
+        executablePath: chromeExecutablePath // 使用指定的 Chrome 路径
     });
     const page = await browser.newPage();
     await page.goto('https://hnasp.cup.com.cn/'); // 替换为实际的登录页面URL
-
+    await page.waitForNetworkIdle();
     // 填写账号
     await page.type('input[placeholder="请输入电话号码进行登录"]', phoneNumber);
 
     // 填写密码
     await page.type('input[type="password"][placeholder="请输入密码"]', password);
+    // 解决验证码
 
-    // console.log('请在浏览器中手动输入验证码...');
+
+
 
     // 在页面中注入提示信息
     await page.evaluate(() => {

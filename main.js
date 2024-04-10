@@ -23,15 +23,11 @@ ipcMain.on('login-and-import-excel', async (event, arg) => {
     };
 
     try {
-        // 修改run函数调用，传入进度更新回调
-        const result = await hello.run(arg.phoneNumber, arg.password, arg.filePath, updateProgressCallback);
+        const result = await hello.run(arg.phoneNumber, arg.password, arg.filePath, arg.chromePath, updateProgressCallback);
         event.reply('login-result', result);
     } catch (error) {
         console.error('Error executing run function:', error);
-
-        // 使用 dialog.showErrorBox 显示错误信息
         dialog.showErrorBox('错误', `执行失败: ${error.message}`);
-
         event.reply('login-error', error.message);
     }
 });

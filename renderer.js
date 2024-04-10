@@ -4,11 +4,12 @@ document.getElementById('start').addEventListener('click', () => {
     const phoneNumber = document.getElementById('phoneNumber').value;
     const password = document.getElementById('password').value;
     const fileInput = document.getElementById('excelFile');
+    const chromePath = document.getElementById('chromePath').value;
 
     if (fileInput.files.length > 0) {
         const filePath = fileInput.files[0].path;
         // 发送用户输入的电话号码、密码和Excel文件的路径到主进程
-        ipcRenderer.send('login-and-import-excel', { phoneNumber, password, filePath });
+        ipcRenderer.send('login-and-import-excel', { phoneNumber, password, filePath,chromePath });
     } else {
         // 如果用户没有选择Excel文件，则弹出提示
         alert('请选择一个 Excel 文件！');
